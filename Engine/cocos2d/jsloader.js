@@ -134,6 +134,7 @@
         'tileMap_nodes/CCTMXLayer.js',
         'parallax_nodes/CCParallaxNode.js',
         'audio/SimpleAudioEngine.js',
+        'debugger/CCUIDebugger.js',
 
         // useless
         'CCUserDefault.js',

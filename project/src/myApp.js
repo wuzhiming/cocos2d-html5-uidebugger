@@ -52,6 +52,7 @@ var MyLayer = cc.Layer.extend({
             },this);
         closeItem.setAnchorPoint(0.5, 0.5);
 
+
         var menu = cc.Menu.create(closeItem);
         menu.setPosition(0, 0);
         this.addChild(menu, 1);
@@ -73,6 +74,13 @@ var MyLayer = cc.Layer.extend({
         this.sprite.setPosition(size.width / 2, size.height / 2);
         this.sprite.setScale(size.height/this.sprite.getContentSize().height);
         this.addChild(this.sprite, 0);
+        var spri = cc.Sprite.create();
+        var spr2 = cc.Sprite.create(s_CloseNormal);
+        spri.setPosition(cc.p(100,200));
+        spr2.setPosition(cc.p(50,50));
+        spri.addChild(spr2);
+        this.addChild(spri);
+
     }
 });
 
