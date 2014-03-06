@@ -3,15 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <title>Full Layout - jQuery EasyUI Demo</title>
-    <link rel="stylesheet" type="text/css" href="easeui/themes/default/easyui.css">
-    <link rel="stylesheet" type="text/css" href="easeui/themes/icon.css">
-    <script type="text/javascript" src="easeui/jquery.min.js"></script>
-    <script type="text/javascript" src="easeui/jquery.easyui.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="easyui/themes/default/easyui.css">
+    <link rel="stylesheet" type="text/css" href="easyui/themes/icon.css">
+    <script type="text/javascript" src="easyui/jquery.min.js"></script>
+    <script type="text/javascript" src="easyui/jquery.easyui.min.js"></script>
 </head>
 <body class="easyui-layout">
 <div data-options="region:'north',border:false" style="height:60px;background:#B3DFDA;padding:10px">
     <a id="btn" href="#" class="easyui-linkbutton" data-options="iconCls:'icon-search'" style="float: right;"
-       onclick="cc.UIDebugger.getInstance().getCurrentSceneTree()">Refresh</a>
+       onclick="cc.UIDebugger.getInstance().getCurrentSceneTree();">Refresh</a>
 </div>
 <div data-options="region:'east',split:true,title:'Layer'" style="width:500px;padding:0px;">
     <div id="layerPannel" class="easyui-panel" title="LayerTree" style="width: 500px;height: 350px;">
@@ -29,8 +29,11 @@
 </div>
 <script src="cocos2d.js"></script>
 <script type="text/javascript">
-    $(function () {
-    });
+    window.onload = function(){
+        var doc = document.createElement("script");
+        doc.src = "easyui/debugger/CCUIDebugger.js";
+        document.body.appendChild(doc);
+    }
 </script>
 </body>
 </html>

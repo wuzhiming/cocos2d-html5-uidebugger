@@ -27,9 +27,20 @@ ccs.LABELRENDERERZ = -1;
  * Base class for ccs.Button
  * @class
  * @extends ccs.Widget
+ *
+ * @property {Number}   boundingWidth       - Width of the bounding area of label, the real content width is limited by boundingWidth
+ * @property {Number}   boundingHeight      - Height of the bounding area of label, the real content height is limited by boundingHeight
+ * @property {String}   string              - The content string of the label
+ * @property {Number}   stringLength        - <@readonly> The content string length of the label
+ * @property {String}   font                - The label font with a style string: e.g. "18px Verdana"
+ * @property {String}   fontName            - The label font name
+ * @property {Number}   fontSize            - The label font size
+ * @property {Number}   textAlign           - Horizontal Alignment of label, cc.TEXT_ALIGNMENT_LEFT|cc.TEXT_ALIGNMENT_CENTER|cc.TEXT_ALIGNMENT_RIGHT
+ * @property {Number}   verticalAlign       - Vertical Alignment of label: cc.VERTICAL_TEXT_ALIGNMENT_TOP|cc.VERTICAL_TEXT_ALIGNMENT_CENTER|cc.VERTICAL_TEXT_ALIGNMENT_BOTTOM
+ * @property {Boolean}  touchScaleEnabled   - Indicate whether the label will scale when touching
  */
 ccs.Label = ccs.Widget.extend(/** @lends ccs.Label# */{
-    _touchScaleChangeEnabled: false,
+    touchScaleEnabled: false,
     _normalScaleValueX: 0,
     _normalScaleValueY: 0,
     _fontName: "",
@@ -41,7 +52,7 @@ ccs.Label = ccs.Widget.extend(/** @lends ccs.Label# */{
     _textHorizontalAlignment:0,
     ctor: function () {
         ccs.Widget.prototype.ctor.call(this);
-        this._touchScaleChangeEnabled = false;
+        this.touchScaleEnabled = false;
         this._normalScaleValueX = 0;
         this._normalScaleValueY = 0;
         this._fontName = "Thonburi";
@@ -102,14 +113,43 @@ ccs.Label = ccs.Widget.extend(/** @lends ccs.Label# */{
     },
 
     /**
-     * set fontName
-     * @param {String} name
+     * Get font Size
+     * @returns {Number}
+     */
+    getFontSize:function(){
+        return this._fontSize;
+    },
+
+    /**
+     * Set font name
+     * @return {String} name
      */
     setFontName: function (name) {
         this._fontName = name;
         this._labelRenderer.setFontName(name);
         this.labelScaleChangedWithSize();
     },
+
+    /**
+     * Get font name
+     * @returns {string}
+     */
+    getFontName:function(){
+        return this._fontName;
+    },
+
+	_setFont: function (font) {
+		var res = cc.LabelTTF._fontStyleRE.exec(font);
+		if(res) {
+			this._fontSize = parseInt(res[1]);
+			this._fontName = res[2];
+			this._labelRenderer._setFont(font);
+			this.labelScaleChangedWithSize();
+		}
+	},
+	_getFont: function () {
+		return this._labelRenderer._getFont();
+	},
 
     /**
      * set textAreaSize
@@ -121,6 +161,22 @@ ccs.Label = ccs.Widget.extend(/** @lends ccs.Label# */{
         this._labelRenderer.setDimensions(size);
         this.labelScaleChangedWithSize();
     },
+	_setBoundingWidth: function (value) {
+		this._textAreaSize.width = value;
+		this._labelRenderer._setBoundingWidth(value);
+		this.labelScaleChangedWithSize();
+	},
+	_setBoundingHeight: function (value) {
+		this._textAreaSize.height = value;
+		this._labelRenderer._setBoundingHeight(value);
+		this.labelScaleChangedWithSize();
+	},
+	_getBoundingWidth: function () {
+		return this._textAreaSize.width;
+	},
+	_getBoundingHeight: function () {
+		return this._textAreaSize.height;
+	},
 
     /**
      * set Horizontal Alignment of cc.LabelTTF
@@ -133,7 +189,15 @@ ccs.Label = ccs.Widget.extend(/** @lends ccs.Label# */{
     },
 
     /**
-     * set Vertical Alignment of cc.LabelTTF
+     * Return Horizontal Alignment of label
+     * @returns {TEXT_ALIGNMENT_LEFT|TEXT_ALIGNMENT_CENTER|TEXT_ALIGNMENT_RIGHT}
+     */
+    getTextHorizontalAlignment:function(){
+        return this._textHorizontalAlignment;
+    },
+
+    /**
+     * Set Vertical Alignment of label
      * @param {cc.VERTICAL_TEXT_ALIGNMENT_TOP|cc.VERTICAL_TEXT_ALIGNMENT_CENTER|cc.VERTICAL_TEXT_ALIGNMENT_BOTTOM} verticalAlignment
      */
     setTextVerticalAlignment: function (alignment) {
@@ -143,11 +207,11 @@ ccs.Label = ccs.Widget.extend(/** @lends ccs.Label# */{
     },
 
     /**
-     * Sets the touch scale enabled of label.
-     * @param {Boolean} enable
+     * Get text vertical alignment.
+     * @returns {VERTICAL_TEXT_ALIGNMENT_TOP|VERTICAL_TEXT_ALIGNMENT_CENTER|VERTICAL_TEXT_ALIGNMENT_BOTTOM}
      */
-    setTouchScaleChangeAble: function (enable) {
-        this.setTouchScaleChangeEnabled(enable);
+    getTextVerticalAlignment:function(){
+        return this._textVerticalAlignment;
     },
 
     /**
@@ -163,9 +227,7 @@ ccs.Label = ccs.Widget.extend(/** @lends ccs.Label# */{
      * @param {Boolean} enable
      */
     setTouchScaleChangeEnabled: function (enable) {
-        this._touchScaleChangeEnabled = enable;
-        //this._normalScaleValueX = this.getScaleX();
-        //this._normalScaleValueY = this.getScaleY();
+        this.touchScaleEnabled = enable;
     },
 
     /**
@@ -173,21 +235,23 @@ ccs.Label = ccs.Widget.extend(/** @lends ccs.Label# */{
      * @returns {Boolean}
      */
     isTouchScaleChangeEnabled: function () {
-        return this._touchScaleChangeEnabled;
+        return this.touchScaleEnabled;
     },
 
     onPressStateChangedToNormal: function () {
-        if (!this._touchScaleChangeEnabled) {
+        if (!this.touchScaleEnabled) {
             return;
         }
-        this.clickScale(this._normalScaleValueX,this._normalScaleValueY);
+        this._labelRenderer.setScaleX(this._normalScaleValueX);
+        this._labelRenderer.setScaleY(this._normalScaleValueY);
     },
 
     onPressStateChangedToPressed: function () {
-        if (!this._touchScaleChangeEnabled) {
+        if (!this.touchScaleEnabled) {
             return;
         }
-        ccs.Widget.prototype.setScale.call(this, this._normalScaleValueX + this._onSelectedScaleOffset,this._normalScaleValueY + this._onSelectedScaleOffset);
+        this._labelRenderer.setScaleX(this._normalScaleValueX + this._onSelectedScaleOffset);
+        this._labelRenderer.setScaleY(this._normalScaleValueY + this._onSelectedScaleOffset);
     },
 
     onPressStateChangedToDisabled: function () {
@@ -200,7 +264,6 @@ ccs.Label = ccs.Widget.extend(/** @lends ccs.Label# */{
      */
     setScale: function (scale) {
         ccs.Widget.prototype.setScale.call(this, scale);
-        this._normalScaleValueX = this._normalScaleValueY = scale;
     },
 
     /**
@@ -219,10 +282,6 @@ ccs.Label = ccs.Widget.extend(/** @lends ccs.Label# */{
     setScaleY: function (scaleY) {
         ccs.Widget.prototype.setScaleY.call(this, scaleY);
         this._normalScaleValueY = scaleY;
-    },
-
-    clickScale: function (scale, scaleY) {
-        this.setScale(scale, scaleY);
     },
 
     /**
@@ -271,6 +330,14 @@ ccs.Label = ccs.Widget.extend(/** @lends ccs.Label# */{
 	        this._labelRenderer.setAnchorPoint(point, y);
         }
     },
+	_setAnchorX: function (value) {
+		ccs.Widget.prototype._setAnchorX.call(this, value);
+		this._labelRenderer._setAnchorX(value);
+	},
+	_setAnchorY: function (value) {
+		ccs.Widget.prototype._setAnchorY.call(this, value);
+		this._labelRenderer._setAnchorY(value);
+	},
 
     onSizeChanged: function () {
         ccs.Widget.prototype.onSizeChanged.call(this);
@@ -284,6 +351,12 @@ ccs.Label = ccs.Widget.extend(/** @lends ccs.Label# */{
     getContentSize: function () {
         return this._labelRenderer.getContentSize();
     },
+	_getWidth: function () {
+		return this._labelRenderer._getWidth();
+	},
+	_getHeight: function () {
+		return this._labelRenderer._getHeight();
+	},
 
     /**
      * override "getVirtualRenderer" method of widget.
@@ -299,6 +372,7 @@ ccs.Label = ccs.Widget.extend(/** @lends ccs.Label# */{
             var renderSize = this._labelRenderer.getContentSize();
             this._size.width = renderSize.width;
             this._size.height = renderSize.height;
+            this._normalScaleValueX = this._normalScaleValueY = 1;
         }
         else {
             var textureSize = this._labelRenderer.getContentSize();
@@ -310,6 +384,8 @@ ccs.Label = ccs.Widget.extend(/** @lends ccs.Label# */{
             var scaleY = this._size.height / textureSize.height;
             this._labelRenderer.setScaleX(scaleX);
             this._labelRenderer.setScaleY(scaleY);
+            this._normalScaleValueX = scaleX;
+            this._normalScaleValueY = scaleY;
         }
     },
 
@@ -329,12 +405,28 @@ ccs.Label = ccs.Widget.extend(/** @lends ccs.Label# */{
         this.setFontName(uiLabel._fontName);
         this.setFontSize(uiLabel._labelRenderer.getFontSize());
         this.setText(uiLabel.getStringValue());
-        this.setTouchScaleChangeEnabled(uiLabel._touchScaleChangeEnabled);
+        this.setTouchScaleChangeEnabled(uiLabel.touchScaleEnabled);
         this.setTextAreaSize(uiLabel._size);
         this.setTextHorizontalAlignment(uiLabel._textHorizontalAlignment);
         this.setTextVerticalAlignment(uiLabel._textVerticalAlignment);
     }
 });
+
+window._proto = ccs.Label.prototype;
+
+// Extended properties
+cc.defineGetterSetter(_proto, "boundingWidth", _proto._getBoundingWidth, _proto._setBoundingWidth);
+cc.defineGetterSetter(_proto, "boundingHeight", _proto._getBoundingHeight, _proto._setBoundingHeight);
+cc.defineGetterSetter(_proto, "string", _proto.getStringValue, _proto.setText);
+cc.defineGetterSetter(_proto, "stringLength", _proto.getStringLength);
+cc.defineGetterSetter(_proto, "font", _proto._getFont, _proto._setFont);
+cc.defineGetterSetter(_proto, "fontSize", _proto.getFontSize, _proto.setFontSize);
+cc.defineGetterSetter(_proto, "fontName", _proto.getFontName, _proto.setFontName);
+cc.defineGetterSetter(_proto, "textAlign", _proto.getTextHorizontalAlignment, _proto.setTextHorizontalAlignment);
+cc.defineGetterSetter(_proto, "verticalAlign", _proto.getTextVerticalAlignment, _proto.setTextVerticalAlignment);
+
+delete window._proto;
+
 /**
  * allocates and initializes a UILabel.
  * @constructs

@@ -289,7 +289,7 @@ cc.GLProgram = cc.Class.extend({
         this._fragShader = null;
         this._uniforms = [];
         this._hashForUniforms = [];
-        this._glContext = glContext || cc.renderContext;
+        this._glContext = glContext || cc._renderContext;
     },
 
     destroyProgram: function () {
@@ -359,9 +359,10 @@ cc.GLProgram = cc.Class.extend({
      * @return {Boolean}
      */
     initWithVertexShaderFilename: function (vShaderFilename, fShaderFileName) {
-        var fileUtils = cc.FileUtils.getInstance();
-        var vertexSource = fileUtils.getTextFileData(vShaderFilename);
-        var fragmentSource = fileUtils.getTextFileData(fShaderFileName);
+        var vertexSource = cc.loader.getRes(vShaderFilename);
+        if(!vertexSource) throw "Please load the resource firset : " + vShaderFilename;
+        var fragmentSource = cc.loader.getRes(fShaderFileName);
+        if(!fragmentSource) throw "Please load the resource firset : " + fShaderFileName;
         return this.initWithVertexShaderByteArray(vertexSource, fragmentSource);
     },
 
@@ -404,7 +405,7 @@ cc.GLProgram = cc.Class.extend({
         this._vertShader = null;
         this._fragShader = null;
 
-        if (cc.COCOS2D_DEBUG) {
+        if (cc.game.config[cc.game.CONFIG_KEY.debugMode]) {
             var status = this._glContext.getProgramParameter(this._programObj, this._glContext.LINK_STATUS);
             if (!status) {
                 cc.log("cocos2d: ERROR: Failed to link program: " + this._glContext.getProgramInfoLog(this._programObj));
@@ -714,7 +715,7 @@ cc.GLProgram = cc.Class.extend({
         this.setUniformLocationWithMatrix4fv(this._uniforms[cc.UNIFORM_MVPMATRIX], matrixMVP.mat, 1);
 
         if (this._usesTime) {
-            var director = cc.Director.getInstance();
+            var director = cc.director;
             // This doesn't give the most accurate global time value.
             // Cocos2D doesn't store a high precision time value, so this will have to do.
             // Getting Mach time per frame per shader using time could be extremely expensive.

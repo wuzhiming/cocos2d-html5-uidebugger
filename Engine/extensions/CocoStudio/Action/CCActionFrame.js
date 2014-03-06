@@ -142,10 +142,17 @@ ccs.ActionMoveFrame = ccs.ActionFrame.extend({
 
     /**
      * Changes the move action position.
-     * @param {cc.Point} pos
+     * @param {cc.Point|Number} pos
+     * @param {Number} y
      */
-    setPosition: function (pos) {
-        this._position = pos;
+    setPosition: function (pos, y) {
+        if (y === undefined) {
+            this._position.x = pos.x;
+            this._position.y = pos.y;
+        } else {
+            this._position.x = pos;
+            this._position.y = y;
+        }
     },
 
     /**
@@ -307,27 +314,31 @@ ccs.ActionFadeFrame = ccs.ActionFrame.extend({
  * @extends ccs.ActionFrame
  */
 ccs.ActionTintFrame = ccs.ActionFrame.extend({
-    _color: 255,
+    _color: null,
     ctor: function () {
         ccs.ActionFrame.prototype.ctor.call(this);
-        this._color = 255;
+        this._color = cc.color(255, 255, 255, 255);
         this._frameType = ccs.FrameType.tint;
     },
 
     /**
      * Changes the tint action color.
-     * @param {number} color
+     * @param {cc.Color} color
      */
     setColor: function (color) {
-        this._color = color;
+        var locColor = this._color;
+        locColor.r = color.r;
+        locColor.g = color.g;
+        locColor.b = color.b;
     },
 
     /**
      * Gets the tint action color.
-     * @returns {number}
+     * @returns {cc.Color}
      */
     getColor: function () {
-        return this._color;
+        var locColor = this._color;
+        return cc.color(locColor.r, locColor.g, locColor.b, locColor.a);
     },
 
     /**

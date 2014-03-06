@@ -30,7 +30,7 @@ ccs.SpriteFrameCacheHelper = ccs.Class.extend({
         this._imagePaths = [];
     },
     addSpriteFrameFromFile:function (plistPath, imagePath) {
-        cc.SpriteFrameCache.getInstance().addSpriteFrames(plistPath, imagePath);
+        cc.spriteFrameCache.addSpriteFrames(plistPath, imagePath);
     },
 
     getTexureAtlasWithTexture:function (texture) {
@@ -39,7 +39,7 @@ ccs.SpriteFrameCacheHelper = ccs.Class.extend({
         var textureName = texture.getName();
         var atlas = this._textureAtlasDic[textureName];
         if (atlas == null) {
-            atlas = cc.TextureAtlas.createWithTexture(texture, 20);
+            atlas = cc.TextureAtlas.create(texture, 20);
             this._textureAtlasDic[textureName] = atlas;
         }
         return atlas;
