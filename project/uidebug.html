@@ -7,33 +7,60 @@
     <link rel="stylesheet" type="text/css" href="easyui/themes/icon.css">
     <script type="text/javascript" src="easyui/jquery.min.js"></script>
     <script type="text/javascript" src="easyui/jquery.easyui.min.js"></script>
+<style type="text/css">
+    .p10{padding: 10px;}
+    .p15{padding: 15px;}
+    .m10{margin: 10px;}
+    .mt10{margin-top: 10px;}
+    .mr10{margin-right: 10px;}
+    .ml10{margin-left: 10px;}
+    .fl{float: left}
+    .fr{float: right}
+    .dib{display: inline-block}
+    .tipArea{width:230px; text-align: left;}
+    .tipText{min-width: 55px;display: inline-block;}
+</style>
 </head>
 <body class="easyui-layout">
-<div data-options="region:'north',border:false" style="height:60px;background:#B3DFDA;padding:10px">
-    <a id="btn" href="#" class="easyui-linkbutton" data-options="iconCls:'icon-search'" style="float: right;"
-       onclick="cc.UIDebugger.getInstance().getCurrentSceneTree();">Refresh</a>
-</div>
-<div data-options="region:'east',split:true,title:'Layer'" style="width:500px;padding:0px;">
-    <div id="layerPannel" class="easyui-panel" title="LayerTree" style="width: 500px;height: 350px;">
-        <div title="TreeMenu" data-options="iconCls:'icon-search'" style="padding:10px;">
+<div data-options="region:'east',split:false,title:'Layer'" style="width: 500px;padding: 0px;">
+    <div id="funBtn" class="easyui-panel p10" title="FunBtn">
+         <a id="btn" href="#" class="easyui-linkbutton fl" data-options="iconCls:'icon-search'" onclick="UIDebugger.getInstance().getCurrentSceneTree();">Refresh</a>
+    </div>
+    <div id="layerPannel" class="easyui-panel layerPannle" title="LayerTree" style="min-height: 200px;">
+        <div title="TreeMenu" data-options="iconCls:'icon-search'" class="p10">
             <ul id="temp" class="easyui-tree"></ul>
         </div>
     </div>
-    <div id="nodeInfoPannel" class="easyui-panel" title="NodeInfo" style="width: 500px;height: 200px; padding: 20px;">
-        <span>position:X:</span><input id="positionX" class="easyui-numberspinner" style="width:60px;">
-        <span> Y:</span><input id="positionY" class="easyui-numberspinner" style="width:60px;" >
+    <div id="nodeInfoPannel" class="easyui-panel p15" title="NodeInfo">
+        <div class="dib tipArea">
+            <span class="tipText">Position:</span>X:<input id="posX" class="easyui-numberspinner" style="width:60px;">
+            <span> Y:</span><input id="posY" class="easyui-numberspinner" style="width:60px;" >
+        </div>
+        <div class="dib tipArea">
+            <span class="tipText">WorldPosition:</span><input id="wPosX" type="text" class="easyui-numberbox"  data-options="disabled:true" style="width: 35px;">
+            <span> Y:</span><input id="wPosY" type="text" class="easyui-numberbox" data-options="disabled:true" style="width: 35px;">
+        </div>
+        <div class="dib tipArea mt10">
+            <span class="tipText">Rotate:</span>X:<input id="rotateX" class="easyui-numberspinner" style="width:60px;">
+            <span> Y:</span><input id="rotateY" class="easyui-numberspinner" style="width:60px;" >
+        </div>
+        <div class="dib tipArea mt10">
+            <span class="tipText">Scale:</span>X:<input id="scaleX" class="easyui-numberspinner" style="width:60px;">
+            <span> Y:</span><input id="scaleY" class="easyui-numberspinner" style="width:60px;" >
+        </div>
+        <div class="dib tipArea mt10">
+        <span class="tipText">Skew:</span>X:<input id="skewX" class="easyui-numberspinner" style="width:60px;">
+        <span> Y:</span><input id="skewY" class="easyui-numberspinner" style="width:60px;" >
+    </div>
     </div>
 </div>
 <div data-options="region:'center',title:'Game'">
     <canvas id="gameCanvas" width="321" height="480"></canvas>
 </div>
-<script src="cocos2d.js"></script>
+<script src="../cocos2d-html5/CCBoot.js"></script>
+<script src="main.js"></script>
+<script type="text/javascript"src="easyui/debugger/CCUIDebugger.js"></script>
 <script type="text/javascript">
-    window.onload = function(){
-        var doc = document.createElement("script");
-        doc.src = "easyui/debugger/CCUIDebugger.js";
-        document.body.appendChild(doc);
-    }
 </script>
 </body>
 </html>

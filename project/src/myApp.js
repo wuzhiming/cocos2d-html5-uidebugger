@@ -89,8 +89,14 @@ var Helloworld = cc.Layer.extend({
         var scaleToA = cc.ScaleTo.create(2, 1, 1);
 
         this.sprite.runAction(cc.Sequence.create(rotateToA, scaleToA));
-        this.helloLabel.runAction(cc.Spawn.create(cc.MoveBy.create(2.5, cc.p(0, size.height - 40)),cc.TintTo.create(2.5,255,125,0)));
-
+        this.helloLabel.runAction(cc.Spawn.create(cc.MoveBy.create(2.5, cc.p(0, size.height - 240)),cc.TintTo.create(2.5,255,125,0)));
+        var actionUp = cc.JumpBy.create(2, cc.p(0, 0), 80, 4);
+        var delay = cc.DelayTime.create(0.25);
+        var act = cc.RepeatForever.create(
+            cc.Sequence.create(actionUp, delay.clone() )
+        )
+        this.helloLabel.setRotation(20);
+        this.helloLabel.runAction(act);
         return true;
     },
     // a selector callback

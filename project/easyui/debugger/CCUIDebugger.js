@@ -1,23 +1,21 @@
 /**
  * Created by wzm on 14-3-3.
  */
-    var tempddd = null;
+var tempddd = null;
 var UIDEBUGGER_NODE_TAG = 9999;
-cc.UIDebugger = cc.Class.extend({
+var UIDebugger = function () {
+};
+UIDebugger.prototype = {
     _NodeArray: [],
     _tmpNodeArray: [],
-    draw: null,
+    scenedraw: null,
     scene: null,
     _nodePosition: null,//用于记录node临时坐标
-    ctor: function () {
-        this.init();
-    },
-    init: function () {
-        this.scene = cc.Director.getInstance().getRunningScene();
-    },
+    _currentNode: null,
     getCurrentSceneTree: function () {
+        this.scene = cc.director.getRunningScene();
         var draw = this.scene.getChildByTag(UIDEBUGGER_NODE_TAG);
-        if(draw){
+        if (draw) {
             draw.removeFromParent(true);
         }
         var sceneChildren = this.scene.getChildren();
@@ -42,15 +40,23 @@ cc.UIDebugger = cc.Class.extend({
         }
         var draw = this.scene.getChildByTag(UIDEBUGGER_NODE_TAG);
         if (!draw) {
-            this.draw = cc.DrawNode.create();
-            this.draw.setTag(UIDEBUGGER_NODE_TAG);
-            this.scene.addChild(this.draw, 1000000);
+            this.scenedraw = cc.DrawNode.create();
+            this.scenedraw.setTag(UIDEBUGGER_NODE_TAG);
+            this.scene.addChild(this.scenedraw, 1000000);
+
         }
         var self = this;
         $("#temp").tree({
             data: this._NodeArray,
             onClick: function (node) {
-                self.showNodeLocation(node.node);
+                if (node) {
+                    if (self._currentNode) {
+                        self._currentNode._showNode = false;
+                    }
+                    self._currentNode = node.node;
+                    self._currentNode._showNode = true;
+                    self._showNodeInfo(node.node);
+                }
             }
         });
     },
@@ -59,60 +65,104 @@ cc.UIDebugger = cc.Class.extend({
             for (var i = 0; i < dataList.length; i++) {
                 var data = dataList[i];
                 if (data.getChildren().length > 0) {
-                    var clame = this.checkTreeClass(data);
-                    var a = {"id": data.__instanceId, "parentId": data.getParent().__instanceId, "node": data, "children": [], "isadd": false, "text": clame.toString()};
+                    var clame = data._className;
+                    var a = {"id": data.__instanceId, "parentId": data.getParent().__instanceId, "node": data, "children": [], "isadd": false, "text": clame};
                     this._tmpNodeArray.push(a);
                     this._parseSceneJson(data.getChildren());
                 } else {
-                    var clame = this.checkTreeClass(data);
-                    var a = {"id": data.__instanceId, "node": data, "parentId": data.getParent().__instanceId, "isadd": false, "text": clame.toString()};
+                    var clame = data._className;
+                    var a = {"id": data.__instanceId, "node": data, "parentId": data.getParent().__instanceId, "isadd": false, "text": clame};
                     this._tmpNodeArray.push(a);
                 }
             }
         }
     },
-    checkTreeClass: function (node) {
-        var cla = [cc.Sprite, cc.Layer, cc.Menu, cc.LabelTTF, cc.MenuItem];
-        var cla2 = ["Sprite", "Layer", "Menu", "LabelTTF", "MenuItem"];
-        for (var i = 0; i < cla.length; i++) {
-            if (node instanceof cla[i]) {
-                return cla2[i];
-            }
-        }
-        return "Node";
-    },
-    showNodeLocation: function (node) {
-        if (node instanceof  cc.Node) {
-            this.draw.clear();
-            var rect = node.getBoundingBox();
-            var nodePoint = cc.p(rect.x, rect.y);
-            var startPoint = this.getWorldPosition(node);
-            var endPoint = cc.p(startPoint.x + rect.width, startPoint.y + rect.height);
-            this.draw.drawRect(startPoint, endPoint, cc.c4f(0, 1, 1, 0.2), 1, cc.c4f(1, 0, 1, 1));
-            this._showNodeInfo(node,startPoint);
-        }
-    },
-    _showNodeInfo:function(node,worldpos){
-        tempddd = node;
+    /*    showNodeLocation: function (node) {
+     if (node instanceof  cc.Node) {
+     this.scenedraw.clear();
+     var rect = node.getBoundingBox();
+     var nodePoint = cc.p(rect.x, rect.y);
+     var startPoint = this.getWorldPosition(node);
+     var endPoint = cc.p(startPoint.x + rect.width, startPoint.y + rect.height);
+     this.scenedraw.drawRect(startPoint, endPoint, cc.color(0, 255, 255, 50), 1, cc.color(255, 0, 255, 255));
+     this._showNodeInfo(node,startPoint);
+     }
+     },*/
+    _showNodeInfo: function (node) {
+        tempddd = node;//for  test
         var self = this;
-        $('#positionX').numberspinner({
-            value: node.getPositionX(),
-            onChange:function(val){
-                node.setPositionX(parseFloat(val));
-                self.showNodeLocation(node);
+        var nodePos = node.getPosition();
+        if (nodePos) {// the  node  position
+            $('#posX').numberspinner({
+                value: nodePos.x,
+                precision:1,
+                onChange: function (val) {
+                    node.x = parseFloat(val);
+                }
+            });
+            $('#posY').numberspinner({
+                value: nodePos.y,
+                precision:1,
+                onChange: function (val) {
+                    node.y = parseFloat(val);
+                }
+            });
+        }
+        var worldPos = self.getWorldPosition(node);
+        if (worldPos) {//the world position
+            $('#wPosX').numberbox({
+                value: worldPos.x
+            });
+            $('#wPosY').numberbox({
+                value: worldPos.y
+            });
+        }
+        $('#rotateX').numberspinner({
+            value: node.rotationX,
+            precision:1,
+            onChange: function (val) {
+                node.rotationX = parseFloat(val);
             }
         });
-        $('#positionY').numberspinner({
-            value: node.getPositionY(),
-            onChange:function(val){
-                node.setPositionY(parseFloat(val));
-                self.showNodeLocation(node);
+        $('#rotateY').numberspinner({
+            value: node.rotationY,
+            precision:1,
+            onChange: function (val) {
+                node.rotationY = parseFloat(val);
+            }
+        });
+        $('#scaleX').numberspinner({
+            value: node.scaleX,
+            precision:2,
+            onChange: function (val) {
+                node.scaleX = parseFloat(val);
+            }
+        });
+        $('#scaleY').numberspinner({
+            value: node.scaleY,
+            precision:2,
+            onChange: function (val) {
+                node.scaleY = parseFloat(val);
+            }
+        });
+        $('#skewX').numberspinner({
+            value: node.skewX,
+            precision:2,
+            onChange: function (val) {
+                node.skewX = parseFloat(val);
+            }
+        });
+        $('#skewY').numberspinner({
+            value: node.skewY,
+            precision:2,
+            onChange: function (val) {
+                node.skewY = parseFloat(val);
             }
         });
     },
     getWorldPosition: function (node) {
-        var bx =  node.getBoundingBox();
-        this._nodePosition = cc.p(bx.x,bx.y);
+        var bx = node.getBoundingBox();
+        this._nodePosition = cc.p(bx.x, bx.y);
         this._getRelativePosition(node);
         return this._nodePosition;
     },
@@ -124,11 +174,11 @@ cc.UIDebugger = cc.Class.extend({
             return this._nodePosition;
         }
     }
-});
-cc.UIDebugger._instance = null;
-cc.UIDebugger.getInstance = function () {
-    if (!cc.UIDebugger._instance) {
-        cc.UIDebugger._instance = new cc.UIDebugger();
+};
+UIDebugger._instance = null;
+UIDebugger.getInstance = function () {
+    if (!UIDebugger._instance) {
+        UIDebugger._instance = new UIDebugger();
     }
-    return cc.UIDebugger._instance;
+    return UIDebugger._instance;
 }

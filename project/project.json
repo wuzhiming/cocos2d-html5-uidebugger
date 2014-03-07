@@ -1,12 +1,12 @@
 {
-    "debugMode" : 4,
+    "debugMode" : 1,
     "showFPS" : true,
     "frameRate" : 60,
     "id" : "gameCanvas",
     "renderMode" : 1,
     "engineDir":"../cocos2d-html5",
 
-    "modules" : ["menus"],
+    "modules" : ["menus","shape-nodes"],
 
     "jsList" : [
         "src/resource.js",
