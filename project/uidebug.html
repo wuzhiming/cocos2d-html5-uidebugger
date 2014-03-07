@@ -18,7 +18,7 @@
     .fr{float: right}
     .dib{display: inline-block}
     .tipArea{width:230px; text-align: left;}
-    .tipText{min-width: 55px;display: inline-block;}
+    .tipText{min-width: 60px;display: inline-block;}
 </style>
 </head>
 <body class="easyui-layout">
@@ -26,9 +26,9 @@
     <div id="funBtn" class="easyui-panel p10" title="FunBtn">
          <a id="btn" href="#" class="easyui-linkbutton fl" data-options="iconCls:'icon-search'" onclick="UIDebugger.getInstance().getCurrentSceneTree();">Refresh</a>
     </div>
-    <div id="layerPannel" class="easyui-panel layerPannle" title="LayerTree" style="min-height: 200px;">
+    <div id="layerPannel" class="easyui-panel layerPannle" title="LayerTree" style="min-height: 200px;max-height: 500px;">
         <div title="TreeMenu" data-options="iconCls:'icon-search'" class="p10">
-            <ul id="temp" class="easyui-tree"></ul>
+            <ul id="layerTree" class="easyui-tree"></ul>
         </div>
     </div>
     <div id="nodeInfoPannel" class="easyui-panel p15" title="NodeInfo">
@@ -49,9 +49,13 @@
             <span> Y:</span><input id="scaleY" class="easyui-numberspinner" style="width:60px;" >
         </div>
         <div class="dib tipArea mt10">
-        <span class="tipText">Skew:</span>X:<input id="skewX" class="easyui-numberspinner" style="width:60px;">
-        <span> Y:</span><input id="skewY" class="easyui-numberspinner" style="width:60px;" >
-    </div>
+            <span class="tipText">Skew:</span>X:<input id="skewX" class="easyui-numberspinner" style="width:60px;">
+            <span> Y:</span><input id="skewY" class="easyui-numberspinner" style="width:60px;" >
+        </div>
+        <div class="dib tipArea mt10">
+            <span class="tipText">AnchorPoint:</span>X:<input id="anchorX" class="easyui-numberspinner" style="width:60px;">
+            <span> Y:</span><input id="anchorY" class="easyui-numberspinner" style="width:60px;" >
+        </div>
     </div>
 </div>
 <div data-options="region:'center',title:'Game'">

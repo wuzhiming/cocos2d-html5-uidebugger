@@ -1,21 +1,18 @@
 /****************************************************************************
- Copyright (c) 2010-2012 cocos2d-x.org
- Copyright (c) 2008-2010 Ricardo Quesada
- Copyright (c) 2011      Zynga Inc.
-
+ Copyright (c) 2010 cocos2d-x.org
+ 
  http://www.cocos2d-x.org
-
-
+ 
  Permission is hereby granted, free of charge, to any person obtaining a copy
  of this software and associated documentation files (the "Software"), to deal
  in the Software without restriction, including without limitation the rights
  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  copies of the Software, and to permit persons to whom the Software is
  furnished to do so, subject to the following conditions:
-
+ 
  The above copyright notice and this permission notice shall be included in
  all copies or substantial portions of the Software.
-
+ 
  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -25,14 +22,14 @@
  THE SOFTWARE.
  ****************************************************************************/
 
-cc.game.onStart = function(){
-    cc.view.adjustViewPort(true);
-    cc.view.setDesignResolutionSize(320,480,cc.ResolutionPolicy.SHOW_ALL);
-    cc.view.resizeWithBrowserSize(true);
-    //load resources
-    cc.LoaderScene.preload(g_mainmenu, function () {
-        cc.director.runScene(new SysMenu.scene());
-    }, this);
-};
+#include "AppDelegate.h"
+#include "cocos2d.h"
 
-cc.game.run();
+USING_NS_CC;
+
+int main(int argc, char *argv[])
+{
+    AppDelegate app;
+    return Application::getInstance()->run();
+}
+

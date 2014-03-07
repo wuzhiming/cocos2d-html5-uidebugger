@@ -46,8 +46,9 @@ UIDebugger.prototype = {
 
         }
         var self = this;
-        $("#temp").tree({
+        $("#layerTree").tree({
             data: this._NodeArray,
+            checkbox:true,
             onClick: function (node) {
                 if (node) {
                     if (self._currentNode) {
@@ -92,73 +93,43 @@ UIDebugger.prototype = {
         tempddd = node;//for  test
         var self = this;
         var nodePos = node.getPosition();
-        if (nodePos) {// the  node  position
-            $('#posX').numberspinner({
-                value: nodePos.x,
-                precision:1,
-                onChange: function (val) {
-                    node.x = parseFloat(val);
-                }
-            });
-            $('#posY').numberspinner({
-                value: nodePos.y,
-                precision:1,
-                onChange: function (val) {
-                    node.y = parseFloat(val);
-                }
-            });
-        }
         var worldPos = self.getWorldPosition(node);
-        if (worldPos) {//the world position
-            $('#wPosX').numberbox({
-                value: worldPos.x
-            });
-            $('#wPosY').numberbox({
-                value: worldPos.y
-            });
+        if (nodePos) {// the  node  position
+            $('#posX').numberspinner({ value: nodePos.x, precision: 1, onChange: function (val) {
+                node.x = parseFloat(val);
+            }});
+            $('#posY').numberspinner({value: nodePos.y, precision: 1, onChange: function (val) {
+                node.y = parseFloat(val);
+            }});
         }
-        $('#rotateX').numberspinner({
-            value: node.rotationX,
-            precision:1,
-            onChange: function (val) {
-                node.rotationX = parseFloat(val);
-            }
-        });
-        $('#rotateY').numberspinner({
-            value: node.rotationY,
-            precision:1,
-            onChange: function (val) {
-                node.rotationY = parseFloat(val);
-            }
-        });
-        $('#scaleX').numberspinner({
-            value: node.scaleX,
-            precision:2,
-            onChange: function (val) {
-                node.scaleX = parseFloat(val);
-            }
-        });
-        $('#scaleY').numberspinner({
-            value: node.scaleY,
-            precision:2,
-            onChange: function (val) {
-                node.scaleY = parseFloat(val);
-            }
-        });
-        $('#skewX').numberspinner({
-            value: node.skewX,
-            precision:2,
-            onChange: function (val) {
-                node.skewX = parseFloat(val);
-            }
-        });
-        $('#skewY').numberspinner({
-            value: node.skewY,
-            precision:2,
-            onChange: function (val) {
-                node.skewY = parseFloat(val);
-            }
-        });
+        if (worldPos) {//the world position
+            $('#wPosX').numberbox({value: worldPos.x});
+            $('#wPosY').numberbox({ value: worldPos.y});
+        }
+        $('#rotateX').numberspinner({value: node.rotationX, precision: 1, onChange: function (val) {
+            node.rotationX = parseFloat(val);
+        }});
+        $('#rotateY').numberspinner({value: node.rotationY, precision: 1, onChange: function (val) {
+            node.rotationY = parseFloat(val);
+        }});
+        $('#scaleX').numberspinner({value: node.scaleX, precision: 2, onChange: function (val) {
+            node.scaleX = parseFloat(val);
+        }});
+        $('#scaleY').numberspinner({value: node.scaleY, precision: 2, onChange: function (val) {
+            node.scaleY = parseFloat(val);
+        }});
+        $('#skewX').numberspinner({value: node.skewX, precision: 2, onChange: function (val) {
+            node.skewX = parseFloat(val);
+        }});
+        $('#skewY').numberspinner({ value: node.skewY, precision: 2, onChange: function (val) {
+            node.skewY = parseFloat(val);
+        }});
+        $('#anchorX').numberspinner({value: node.anchorX, precision: 1, min: 0, max: 1, onChange: function (val) {
+            node.anchorX = parseFloat(val);
+        }});
+        $('#anchorY').numberspinner({value: node.anchorY, precision: 1, min: 0, max: 1, onChange: function (val) {
+            node.anchorY = parseFloat(val);
+        }});
     },
     getWorldPosition: function (node) {
         var bx = node.getBoundingBox();
