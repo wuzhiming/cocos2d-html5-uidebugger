@@ -4,6 +4,7 @@
 var tempddd = null;
 var UIDEBUGGER_NODE_TAG = 9999;
 var UIDebugger = function () {
+    this.init();
 };
 UIDebugger.prototype = {
     _NodeArray: [],
@@ -12,6 +13,12 @@ UIDebugger.prototype = {
     scene: null,
     _nodePosition: null,//用于记录node临时坐标
     _currentNode: null,
+    dotColor: null,
+    dotColor2: null,
+    init: function () {
+        this.dotColor = cc.color(255, 0, 255, 255);
+        this.dotColor2 = cc.color(255, 0, 0, 255);
+    },
     getCurrentSceneTree: function () {
         this.scene = cc.director.getRunningScene();
         var draw = this.scene.getChildByTag(UIDEBUGGER_NODE_TAG);
@@ -48,18 +55,23 @@ UIDebugger.prototype = {
         var self = this;
         $("#layerTree").tree({
             data: this._NodeArray,
-            checkbox:true,
+            checkbox: true,
+            check:true,
+            cascadeCheck:false,
+            onCheck:function(node,checked){
+                self._toggleNode(node,checked);
+            },
             onClick: function (node) {
                 if (node) {
-                    if (self._currentNode) {
-                        self._currentNode._showNode = false;
-                    }
-                    self._currentNode = node.node;
-                    self._currentNode._showNode = true;
                     self._showNodeInfo(node.node);
                 }
             }
         });
+    },
+    _toggleNode:function(node,checked){
+        if(node.node instanceof cc.Node){
+            node.node.visible = checked;
+        }
     },
     _parseSceneJson: function (dataList) {
         if (dataList instanceof Array) {
@@ -67,45 +79,34 @@ UIDebugger.prototype = {
                 var data = dataList[i];
                 if (data.getChildren().length > 0) {
                     var clame = data._className;
-                    var a = {"id": data.__instanceId, "parentId": data.getParent().__instanceId, "node": data, "children": [], "isadd": false, "text": clame};
+                    var a = {"id": data.__instanceId,checked:data.visible, "parentId": data.getParent().__instanceId, "node": data, "children": [], "isadd": false, "text": clame};
                     this._tmpNodeArray.push(a);
                     this._parseSceneJson(data.getChildren());
                 } else {
                     var clame = data._className;
-                    var a = {"id": data.__instanceId, "node": data, "parentId": data.getParent().__instanceId, "isadd": false, "text": clame};
+                    var a = {"id": data.__instanceId,checked:data.visible, "node": data, "parentId": data.getParent().__instanceId, "isadd": false, "text": clame};
                     this._tmpNodeArray.push(a);
                 }
             }
         }
     },
-    /*    showNodeLocation: function (node) {
-     if (node instanceof  cc.Node) {
-     this.scenedraw.clear();
-     var rect = node.getBoundingBox();
-     var nodePoint = cc.p(rect.x, rect.y);
-     var startPoint = this.getWorldPosition(node);
-     var endPoint = cc.p(startPoint.x + rect.width, startPoint.y + rect.height);
-     this.scenedraw.drawRect(startPoint, endPoint, cc.color(0, 255, 255, 50), 1, cc.color(255, 0, 255, 255));
-     this._showNodeInfo(node,startPoint);
-     }
-     },*/
     _showNodeInfo: function (node) {
         tempddd = node;//for  test
         var self = this;
         var nodePos = node.getPosition();
-        var worldPos = self.getWorldPosition(node);
+        var worldPos = this.getWorldPositionWithAnchor(node);
         if (nodePos) {// the  node  position
             $('#posX').numberspinner({ value: nodePos.x, precision: 1, onChange: function (val) {
                 node.x = parseFloat(val);
+                self.showNodeLocation(node);
             }});
             $('#posY').numberspinner({value: nodePos.y, precision: 1, onChange: function (val) {
                 node.y = parseFloat(val);
+                self.showNodeLocation(node);
             }});
         }
-        if (worldPos) {//the world position
-            $('#wPosX').numberbox({value: worldPos.x});
-            $('#wPosY').numberbox({ value: worldPos.y});
-        }
+        $('#wPosX').numberbox({value: worldPos.x});
+        $('#wPosY').numberbox({ value: worldPos.y});
         $('#rotateX').numberspinner({value: node.rotationX, precision: 1, onChange: function (val) {
             node.rotationX = parseFloat(val);
         }});
@@ -126,24 +127,63 @@ UIDebugger.prototype = {
         }});
         $('#anchorX').numberspinner({value: node.anchorX, precision: 1, min: 0, max: 1, onChange: function (val) {
             node.anchorX = parseFloat(val);
+            self.showNodeLocation(node);
         }});
         $('#anchorY').numberspinner({value: node.anchorY, precision: 1, min: 0, max: 1, onChange: function (val) {
             node.anchorY = parseFloat(val);
+            self.showNodeLocation(node);
         }});
+        this.showNodeLocation(node);
     },
-    getWorldPosition: function (node) {
+    showNodeLocation: function (node) {
+        if (node instanceof  cc.Node) {
+            if (this._currentNode) {
+                this._currentNode._showNode = false;
+                var parentNode = this._currentNode.getParent();
+                if (parentNode) {
+                    parentNode._showNode = false;
+                }
+            }
+            this._currentNode = node;
+            this._currentNode._showNode = true;
+            var parentNode = this._currentNode.getParent();
+            if (parentNode) {
+                parentNode._showNode = true;
+            }
+            this.scenedraw.clear();
+            var nodeWorldPos = this.getWorldPositionWithAnchor(node);
+            var pareNode = node.getParent();
+            if (pareNode) {
+                var pNodeWorldPos = this.getWorldPositionBottomLeft(pareNode);
+                var nodePos = pareNode.getPosition();
+                var xPosLine = cc.p(nodeWorldPos.x, pNodeWorldPos.y);
+                var yPosLine = cc.p(pNodeWorldPos.x, nodeWorldPos.y);
+                this.scenedraw.drawSegment(xPosLine, nodeWorldPos, 2);
+                this.scenedraw.drawSegment(yPosLine, nodeWorldPos, 2);
+                this.scenedraw.drawDot(pNodeWorldPos, 4, this.dotColor2);
+                /*                var rect = pareNode.getBoundingBox();
+                 var nodePoint = cc.p(rect.x, rect.y);
+                 var startPoint = this.getWorldPositionBottomLeft(pareNode);
+                 var endPoint = cc.p(startPoint.x + rect.width, startPoint.y + rect.height);
+                 this.scenedraw.drawRect(startPoint, endPoint, cc.color(0, 255, 255, 50), 1, cc.color(255, 0, 255, 255));*/
+            }
+            this.scenedraw.drawDot(nodeWorldPos, 4, this.dotColor);
+        }
+    },
+    getWorldPositionBottomLeft: function (node) {//node's bottomleft position
         var bx = node.getBoundingBox();
         this._nodePosition = cc.p(bx.x, bx.y);
-        this._getRelativePosition(node);
-        return this._nodePosition;
-    },
-    _getRelativePosition: function (node) {
         if (node.getParent()) {
             this._nodePosition = node.getParent().convertToWorldSpace(this._nodePosition);
-            this._getRelativePosition(node.getParent());
         } else {
-            return this._nodePosition;
+            this._nodePosition = node.getPosition();
         }
+        return this._nodePosition;
+    },
+    getWorldPositionWithAnchor: function (node) {//the real position;
+        var wordpos = this.getWorldPositionBottomLeft(node);
+        var wordpos2 = cc.p(wordpos.x + node.width * node.anchorX, wordpos.y + node.height * node.anchorY);
+        return wordpos2;
     }
 };
 UIDebugger._instance = null;
